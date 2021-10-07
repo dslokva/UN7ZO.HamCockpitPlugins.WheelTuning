@@ -2,6 +2,6 @@
 <Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <StartAction>Program</StartAction>
-    <StartProgram>D:\Source\HamCockpit\Debug\VE3NEA.HamCockpit.exe</StartProgram>
+    <StartProgram>D:\Projects\VisualStudioCSharp\HamCockpit\Debug\VE3NEA.HamCockpit.exe</StartProgram>
   </PropertyGroup>
 </Project>

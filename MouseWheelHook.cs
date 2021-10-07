@@ -103,6 +103,9 @@ namespace UN7ZO.HamCockpitPlugins.WheelTuning {
         }
 
         private int MouseHookProc(int nCode, int wParam, IntPtr lParam) {
+            if (!ApplicationIsActivated())
+                return CallNextHookEx(_hGlobalLlMouseHook, nCode, wParam, lParam);
+
             if (nCode >= 0) {
                 MouseLL_HookStruct mouseHookStruct = (MouseLL_HookStruct) Marshal.PtrToStructure(lParam, typeof(MouseLL_HookStruct));
 
@@ -127,5 +130,25 @@ namespace UN7ZO.HamCockpitPlugins.WheelTuning {
             //call next hook
             return CallNextHookEx(_hGlobalLlMouseHook, nCode, wParam, lParam);
         }
+
+        public static bool ApplicationIsActivated() {
+            var activatedHandle = GetForegroundWindow();
+            if (activatedHandle == IntPtr.Zero) {
+                return false;       // No window is currently activated
+            }
+
+            var procId = Process.GetCurrentProcess().Id;
+            int activeProcId;
+            GetWindowThreadProcessId(activatedHandle, out activeProcId);
+
+            return activeProcId == procId;
+        }
+
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
+        private static extern IntPtr GetForegroundWindow();
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        private static extern int GetWindowThreadProcessId(IntPtr handle, out int processId);
     }
 }

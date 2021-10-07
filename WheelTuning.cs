@@ -21,9 +21,7 @@ namespace UN7ZO.HamCockpitPlugins.WheelTuning {
 
         [ImportingConstructor]
         WheelTuning([Import(typeof(IPluginHost))] IPluginHost host) {
-            this.host = host;
-            host.DspPipeline.Tuner.Tuned += TunedEventhandler;
-            host.DspPipeline.StatusChanged += StatusChanged;
+            this.host = host;          
             stepSizePanel.plugin = this;
 
             _wheelHook = new MouseWheelHook();
@@ -35,13 +33,14 @@ namespace UN7ZO.HamCockpitPlugins.WheelTuning {
         }
 
         private void StatusChanged(object sender, EventArgs e) {
-            if (host.DspPipeline.Active) {
-                _wheelHook.SetUpHook();
-                _wheelHook.MouseWheelEvent += Control_MouseWheel;
-            } else {
-                _wheelHook.ClearHook();
-                _wheelHook.MouseWheelEvent -= Control_MouseWheel;
-            }
+            if (this.Enabled)
+                if (host.DspPipeline.Active) {
+                    _wheelHook.SetUpHook();
+                    _wheelHook.MouseWheelEvent += Control_MouseWheel;
+                } else {
+                    _wheelHook.MouseWheelEvent -= Control_MouseWheel;
+                    _wheelHook.ClearHook();
+                }
         }
 
         private void TunedEventhandler(object sender, EventArgs e) {
@@ -121,11 +120,20 @@ namespace UN7ZO.HamCockpitPlugins.WheelTuning {
                 stepSizePanel.RefreshStepSizeControl();
                 stepSizePanel.Invalidate();
             }
+
+            if (Enabled) {
+                host.DspPipeline.Tuner.Tuned += TunedEventhandler;
+                host.DspPipeline.StatusChanged += StatusChanged;
+            } else {
+                host.DspPipeline.Tuner.Tuned -= TunedEventhandler;
+                host.DspPipeline.StatusChanged -= StatusChanged;
+            }
+
         }
         #endregion
 
-
         public void Dispose() {
+            _wheelHook.MouseWheelEvent -= Control_MouseWheel;
             stepSizePanel.Dispose();
             ToolStrip.Dispose();
         }
